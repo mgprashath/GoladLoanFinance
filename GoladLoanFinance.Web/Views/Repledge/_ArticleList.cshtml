@@ -1,0 +1,39 @@
+﻿@model List<RepledgeViewModel>
+@{
+    ViewData["Title"] = "Repledge";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Loan ID</th>
+            <th>Article Name</th>
+            <th>Unit</th>
+            <th>Loan Amount</th>
+            <th>Date Taken</th>
+            <th>Due Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" asp-for="@Model[i].Selected" />
+                </td>
+                <td>@Model[i].LoanId <input asp-for="@Model[i].LoanId" type="hidden" /><input asp-for="@Model[i].ArticleId" type="hidden" /></td>
+                <td>@Model[i].ArticleName <input asp-for="@Model[i].ArticleName" type="hidden" /></td>
+                <td>@Model[i].Unit <input asp-for="@Model[i].Unit" type="hidden" /></td>
+                <td>@Model[i].LoanAmount <input asp-for="@Model[i].LoanAmount" type="hidden" /></td>
+                <td>@Model[i].DateTaken <input asp-for="@Model[i].DateTaken" type="hidden" /></td>
+                <td>@Model[i].DueDate <input asp-for="@Model[i].DueDate" type="hidden" /></td>
+            </tr>
+        }
+
+        @* <tr>
+                <td>Bank</td>
+                <td><select asp-for="@Model."><option selected>--Select Bank--</option></select></td>
+        </tr> *@
+    </tbody>
+</table>

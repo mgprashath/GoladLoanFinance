@@ -5,23 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel;
 
 namespace GoldLoanFinance.Domain.Entities
 {
-    public class Repledge
+    public class RepledgeMaster
     {
         [Key]
+        [DisplayName("Repledge Id")]
         public int RepledgeId { get; set; }
         [Required]
+        [DisplayName("Loan Amount From Bank")]
         public decimal LoanAmountFromBank { get; set; }
+        [DisplayName("Date")]
         public DateTime DatePledged { get; set; } = DateTime.Now;
 
+        [Required]
         [ForeignKey("Bank")]
         public int BankId { get; set; }
         public  Bank Bank { get; set; }
 
-        [ForeignKey("Article")]
-        public int ArticleId { get; set; }
-        public Article Article { get; set; }
+        public List<RepledgeDetails> RepledgeDetails { get; set; }
+
     }
 }

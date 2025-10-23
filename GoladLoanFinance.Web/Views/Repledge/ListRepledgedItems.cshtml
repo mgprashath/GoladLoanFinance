@@ -1,0 +1,53 @@
+﻿@model IEnumerable<GoldLoanFinance.Domain.Entities.RepledgeMaster>
+
+@{
+    ViewData["Title"] = "ListRepledgedItems";
+}
+
+<h4>List of Repledged Items</h4>
+<br />
+<p>
+    <a asp-action="CreateRepledge" asp-controller="Repledge">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RepledgeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Bank)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LoanAmountFromBank)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DatePledged)
+            </th>            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                    @Html.DisplayFor(modelItem => item.RepledgeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Bank.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LoanAmountFromBank)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DatePledged)
+            </td>           
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RepledgeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RepledgeId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RepledgeId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

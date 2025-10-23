@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 
 namespace GoldLoanFinance.Domain.Entities
 {
-    public class Article
+    public class LoanDetails
     {
         [Key]
         public int ArticleId { get; set; }
         [Required]
-        [MaxLength(100)]
-        public string Description { get; set; }
+        public string ArticleName { get; set; }
         [Required]
-        public decimal WeightInGrams { get; set; }
+        public uint Unit { get; set; } = default;
+
+        public bool IsPledgedToBank { get; set; } = false;
+
         [Required]
-        public decimal AppraisedValue { get; set; }
+        [ForeignKey("LoanMaster")]
+        public int LoanId { get; set; }
+        public LoanMaster LoanMaster { get; set; }
     }
 }

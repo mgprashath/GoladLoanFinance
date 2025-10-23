@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GoldLoanFinance.Web.Controllers
 {
-    public class CustomerController : Controller
+    public class BankController : Controller
     {
-        private readonly CustomerService _customer;
+        private readonly BankServices _bankServices;
 
-        public CustomerController(CustomerService customer)
+        public BankController(BankServices bankServices)
         {
-            _customer = customer;
+            _bankServices = bankServices;
         }
         public IActionResult Index()
         {
-            List<Customer> list = _customer.GetAllCustomers();
+            List<Bank> list = _bankServices.GetAllBanks();
             return View(list);
         }
 
@@ -25,41 +25,41 @@ namespace GoldLoanFinance.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Customer customer)
+        public IActionResult Create(Bank bank)
         {
-            bool result = _customer.AddCustomer(customer);
+            bool result = _bankServices.AddBank(bank);
             return RedirectToAction("Index");
         }
 
         public IActionResult Edit(int id)
         {
-            Customer? customer = _customer.GetCustomer(id);
-            if (customer == null)
+            Bank? bank = _bankServices.GetBank(id);
+            if (bank == null)
             {
                 return RedirectToAction("Index");
             }
-            return View(customer);
+            return View(bank);
         }
 
-        public IActionResult Update(Customer customer)
+        public IActionResult Update(Bank bank)
         {
-            bool result = _customer.UpdateCustomer(customer);
+            bool result = _bankServices.UpdateBank(bank);
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
-            Customer? customer = _customer.GetCustomer(id);
-            if (customer == null)
+            Bank? bank = _bankServices.GetBank(id);
+            if (bank == null)
             {
                 return RedirectToAction("Index");
             }
-            return View(customer);
+            return View(bank);
         }
 
         public IActionResult Delete(int id)
         {
-            bool result = _customer.DeleteCustomer(id);
+            bool result = _bankServices.DeleteBank(id);
             return RedirectToAction("Index");
         }
     }

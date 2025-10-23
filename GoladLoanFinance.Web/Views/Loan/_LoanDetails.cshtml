@@ -1,0 +1,87 @@
+﻿@model GoldLoanFinance.Domain.Entities.LoanDetails
+
+<div class="row">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-4">        
+        <div class="form-group">
+            <label asp-for="ArticleName" class="control-label"></label>
+            <input asp-for="ArticleName" class="form-control" id="txtName"/>
+            <span asp-validation-for="ArticleName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label asp-for="Unit" class="control-label"></label>
+            <input asp-for="Unit" class="form-control" type="number" min="1" value="1" id="txtUnit"/>
+            <span asp-validation-for="Unit" class="text-danger"></span>
+        </div>
+    </div>
+   
+    <div class="col-md-4">
+        <br />
+        <div class="form-group">
+            <button type="button" class="btn btn-secondary" id="AddBtn">Add</button>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-8"></div>
+    <div class="col-md-4">
+        <button type="button" class="btn btn-secondary" id="AddAllBtn">Ok</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </div>
+</div>
+<br />
+<div class="row">
+    <table class="table table-sm mt-2" id="itemsTable">
+        <thead>
+            <tr>
+                <th>Article Name</th>
+                <th>Unit</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>   
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.getElementById("AddBtn").addEventListener('click',Add);
+    });
+
+    document.querySelector("#itemsTable tbody").addEventListener("click", function(e){
+        if(e.target.classList.contains("removeBtn")){
+            e.target.closest("tr").remove();
+        }
+    });
+
+    function Add(){
+        const name = document.getElementById("txtName").value.trim();
+        const unit = document.getElementById("txtUnit").value.trim();
+
+        const validateSpan = document.querySelector('[data-valmsg-for="ArticleName"]');
+        validateSpan.textContent="";
+
+        if(!name){
+            validateSpan.textContent="The Name field is required.";
+            document.getElementById("txtName").focus();
+            return;
+        }
+
+        const tbody = document.querySelector("#itemsTable tbody");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${name}</td><td>${unit}</td>
+        <td><button type="button" class="btn text-danger text-decoration-none removeBtn" >X</button></td>`;
+        tbody.appendChild(tr);
+
+        document.getElementById("txtName").value="";
+        document.getElementById("txtUnit").value="1";
+    }
+
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

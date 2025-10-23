@@ -4,6 +4,7 @@ using GoldLoanFinance.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoldLoanFinance.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021150021_keyReferenceCorrection")]
+    partial class keyReferenceCorrection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,9 +111,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPledgedToBank")
-                        .HasColumnType("bit");
-
                     b.Property<int>("LoanId")
                         .HasColumnType("int");
 
@@ -128,7 +128,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         {
                             ArticleId = 1,
                             ArticleName = "Ring",
-                            IsPledgedToBank = false,
                             LoanId = 1,
                             Unit = 1L
                         });
@@ -155,6 +154,9 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("DATEADD(year,1,GETDATE())");
 
+                    b.Property<bool>("IsPledgedToBank")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("LoanAmount")
                         .HasPrecision(15, 5)
                         .HasColumnType("decimal(15,5)");
@@ -172,6 +174,7 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                             CustomerId = 1,
                             DateTaken = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DueDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsPledgedToBank = false,
                             LoanAmount = 150.00m
                         });
                 });

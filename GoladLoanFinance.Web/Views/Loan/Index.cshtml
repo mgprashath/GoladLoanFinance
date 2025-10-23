@@ -1,0 +1,152 @@
+﻿@model GoldLoanFinance.Web.Models.LoanViewModel
+
+@{
+    ViewData["Title"] = "Create Loan";
+}
+
+<h4>Create Loan</h4>
+
+<hr />
+ 
+<form asp-action="CreateLoan" asp-controller="Loan" id="loanForm">
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="LoanMaster.LoanAmount" class="control-label"></label>
+                <input asp-for="LoanMaster.LoanAmount" class="form-control" />
+                <span asp-validation-for="LoanMaster.LoanAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LoanMaster.DateTaken" class="control-label"></label>
+                <input asp-for="LoanMaster.DateTaken" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LoanMaster.DueDate" class="control-label"></label>
+                <input asp-for="LoanMaster.DueDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LoanMaster.Customer.Name" class="control-label"></label>
+                <select asp-for="LoanMaster.CustomerId" class="form-control" asp-items="@Model.CustomerList">
+                    <option disabled selected>--Select Customer--</option>
+                </select>
+                <span asp-validation-for="LoanMaster.CustomerId" class="text-danger"></span>
+            </div>
+            <div>
+                <div class="form-group">
+                    <input asp-for="LoanDetailsJson" type="hidden" id="LoanDetailsJson" name="LoanDetailsJson">
+                </div>
+            </div>
+            @if (ViewBag.ResponseMessage != null)
+            {
+                <p>ViewBag.ResponseMessage</p>
+            }
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create Loan" class="btn btn-primary" />
+                <a class="btn btn-primary" asp-action="ListLoans" asp-controller="Loan">Cancel</a>
+            </div>
+        </div>
+        <div class="col-md-4"> 
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Article Name</label>
+                        <input class="form-control" id="txtName" />
+                        <span id="valArticleName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Units</label>
+                        <input class="form-control" type="number" min="1" value="1" id="txtUnit" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div id="formMessage" class="text-danger"></div>
+                    <table class="table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Article Name</th>
+                                <th>Unit</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <br />
+            <div class="form-group">
+                <button type="button" class="btn btn-secondary" id="AddBtn">Add</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.getElementById("AddBtn").addEventListener('click',Add);
+    });
+
+    document.querySelector("#itemsTable tbody").addEventListener("click", function(e){
+        if(e.target.classList.contains("removeBtn")){
+            e.target.closest("tr").remove();
+        }
+    });
+
+    document.getElementById("txtName").addEventListener("focus", function(){
+        document.getElementById("formMessage").textContent = "";
+    });
+
+    document.getElementById("loanForm").addEventListener('submit', function(e){
+        const rows = document.querySelectorAll('#itemsTableBody tr');
+        const data = [];
+        const messageDiv = document.getElementById("formMessage");
+        
+        rows.forEach(r => {
+            const article = r.cells[0].innerText.trim();
+            const unit = parseInt(r.cells[1].innerText.trim(),10);
+            data.push({ArticleName:article,Unit:unit});
+        });
+
+        if(data.length===0){
+            e.preventDefault();
+            messageDiv.innerText="Please add at least one item before submitting the form.";
+            return;
+        }
+
+        document.getElementById("LoanDetailsJson").value = JSON.stringify(data);
+    });
+
+    function Add(){
+        const name = document.getElementById("txtName").value.trim();
+        const unit = document.getElementById("txtUnit").value.trim();
+
+        const validateSpan = document.getElementById("valArticleName");
+        validateSpan.textContent="";
+
+        if(!name){
+            validateSpan.textContent="The Name field is required.";
+            document.getElementById("txtName").focus();
+            return;
+        }
+
+        const tbody = document.querySelector("#itemsTable tbody");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${name}</td><td>${unit}</td><td><a type="button" class="text-decoration-none removeBtn" >X</a></td>`;
+        tbody.appendChild(tr);
+
+        document.getElementById("txtName").value="";
+        document.getElementById("txtUnit").value="1";
+    }
+
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

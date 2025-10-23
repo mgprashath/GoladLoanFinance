@@ -4,6 +4,7 @@ using GoldLoanFinance.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoldLoanFinance.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251020131808_AddingMasterAndDetailTables")]
+    partial class AddingMasterAndDetailTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,18 +41,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                     b.HasKey("BankId");
 
                     b.ToTable("Banks");
-
-                    b.HasData(
-                        new
-                        {
-                            BankId = 1,
-                            Name = "HNB"
-                        },
-                        new
-                        {
-                            BankId = 2,
-                            Name = "ABC"
-                        });
                 });
 
             modelBuilder.Entity("GoldLoanFinance.Domain.Entities.Customer", b =>
@@ -78,22 +69,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
-
-                    b.HasData(
-                        new
-                        {
-                            CustomerId = 1,
-                            NIC = "856987452v",
-                            Name = "Prashath",
-                            Phone = "0715689562"
-                        },
-                        new
-                        {
-                            CustomerId = 2,
-                            NIC = "895698236v",
-                            Name = "Ranmini",
-                            Phone = "0715458533"
-                        });
                 });
 
             modelBuilder.Entity("GoldLoanFinance.Domain.Entities.LoanDetails", b =>
@@ -108,30 +83,17 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPledgedToBank")
-                        .HasColumnType("bit");
-
                     b.Property<int>("LoanId")
                         .HasColumnType("int");
 
-                    b.Property<long>("Unit")
-                        .HasColumnType("bigint");
+                    b.Property<int>("Unit")
+                        .HasColumnType("int");
 
                     b.HasKey("ArticleId");
 
                     b.HasIndex("LoanId");
 
                     b.ToTable("LoanDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            ArticleId = 1,
-                            ArticleName = "Ring",
-                            IsPledgedToBank = false,
-                            LoanId = 1,
-                            Unit = 1L
-                        });
                 });
 
             modelBuilder.Entity("GoldLoanFinance.Domain.Entities.LoanMaster", b =>
@@ -146,14 +108,13 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTaken")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DueDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("DATEADD(year,1,GETDATE())");
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPledgedToBank")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("LoanAmount")
                         .HasPrecision(15, 5)
@@ -164,16 +125,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("LoanMaster");
-
-                    b.HasData(
-                        new
-                        {
-                            LoanId = 1,
-                            CustomerId = 1,
-                            DateTaken = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DueDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LoanAmount = 150.00m
-                        });
                 });
 
             modelBuilder.Entity("GoldLoanFinance.Domain.Entities.RepledgeDetails", b =>
@@ -227,7 +178,7 @@ namespace GoldLoanFinance.Infrastructure.Migrations
             modelBuilder.Entity("GoldLoanFinance.Domain.Entities.LoanDetails", b =>
                 {
                     b.HasOne("GoldLoanFinance.Domain.Entities.LoanMaster", "LoanMaster")
-                        .WithMany("LoanDetails")
+                        .WithMany()
                         .HasForeignKey("LoanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -255,7 +206,7 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("GoldLoanFinance.Domain.Entities.RepledgeMaster", "RepledgeMaster")
-                        .WithMany("RepledgeDetails")
+                        .WithMany()
                         .HasForeignKey("RepledgeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -274,16 +225,6 @@ namespace GoldLoanFinance.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Bank");
-                });
-
-            modelBuilder.Entity("GoldLoanFinance.Domain.Entities.LoanMaster", b =>
-                {
-                    b.Navigation("LoanDetails");
-                });
-
-            modelBuilder.Entity("GoldLoanFinance.Domain.Entities.RepledgeMaster", b =>
-                {
-                    b.Navigation("RepledgeDetails");
                 });
 #pragma warning restore 612, 618
         }
