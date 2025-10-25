@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model RepledgeMasterViewModel
+@{
+    ViewData["Title"] = "Repledge";
+}
+
+<h4>Repledge Items Details</h4>
+<br />
+<form asp-action="Update" asp-controller="Repledge" method="post" id="repledgeForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="modal-body">
+                <div class="form-group" id="articleList">
+                    @{
+                        var vd = new ViewDataDictionary(ViewData);
+                        vd.TemplateInfo.HtmlFieldPrefix = "RepledgeViewModels";
+                    }
+                    @await Html.PartialAsync("_ArticleDetails", Model.RepledgeViewModels, vd)
+                </div>
+                <div id="formMessage" class="text-danger"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <input type="hidden" asp-for="RepledgeMaster.RepledgeId" />
+            <div class="form-group">
+                <label asp-for="RepledgeMaster.Bank.Name" class="control-label"></label>
+                <input asp-for="RepledgeMaster.Bank.Name" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="RepledgeMaster.LoanAmountFromBank" class="control-labal"></label>
+                <input asp-for="RepledgeMaster.LoanAmountFromBank" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="RepledgeMaster.DatePledged" class="control-labal"></label>
+                <input asp-for="RepledgeMaster.DatePledged" class="form-control" disabled />
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <a asp-action="ListRepledgedItems" asp-controller="Repledge" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById('repledgeForm').addEventListener('submit', function (e) {
+      const anyChecked = document.querySelector(
+        '#articleList input[type="checkbox"][name^="RepledgeViewModels"][name$=".Selected"]:checked'
+      );
+      const messageDiv = document.getElementById("formMessage");
+      if (!anyChecked) {
+        e.preventDefault();
+        messageDiv.innerText="Please add at least one item before submitting the form.";
+        return;
+      }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

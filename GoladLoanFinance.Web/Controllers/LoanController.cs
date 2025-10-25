@@ -44,7 +44,7 @@ namespace GoldLoanFinance.Web.Controllers
                 bool result = _loanService.CreateLoan(loanMaster);
             }
 
-            ViewBag.ResponseMessage = "Success";
+            ViewBag.ResponseMessage = "Success";          
 
             return RedirectToAction("ListLoans");
         }
@@ -79,11 +79,6 @@ namespace GoldLoanFinance.Web.Controllers
         public IActionResult Edit(int id)
         {
             LoanMaster? loanMaster = _loanService.GetLoanById(id);
-
-            if (loanMaster==null)
-            {
-                return NotFound();
-            }
 
             LoanViewModel loanViewModel = new()
             {

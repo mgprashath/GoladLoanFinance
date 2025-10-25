@@ -80,8 +80,10 @@ namespace GoldLoanFinance.Web.Controllers
 
         public IActionResult Edit(int id)
         {
-            RepledgeMaster? loan = _repledgeService.GetRepledgeItemsById(id);
-            if (loan == null)
+            RepledgeMaster? repledgeMaster = _repledgeService.GetRepledgeItemsById(id);
+            List<LoanMaster> loan = _loanService.GetAllLoans();
+
+            if (repledgeMaster==null)
             {
                 return NotFound();
             }
@@ -92,30 +94,27 @@ namespace GoldLoanFinance.Web.Controllers
                 Value = u.BankId.ToString()
             }).ToList();
 
-            List<RepledgeViewModel> repledgeViewModels = new List<RepledgeViewModel>();
+            List<RepledgeViewModel> model = loan
+               .SelectMany(l => l.LoanDetails, (l, d) => new RepledgeViewModel
+               {
+                   ArticleId = d.ArticleId,
+                   LoanId = l.LoanId,
+                   ArticleName = d.ArticleName,
+                   Unit = d.Unit,
+                   LoanAmount = l.LoanAmount,
+                   DateTaken = l.DateTaken,
+                   DueDate = l.DueDate,
+                   Selected = d.IsPledgedToBank
+               })
+               .ToList();
 
-            foreach(RepledgeDetails item in loan.RepledgeDetails)
-            {
-                RepledgeViewModel val = new RepledgeViewModel();
+            RepledgeMasterViewModel repledgeMasterViewModel = new RepledgeMasterViewModel();
 
-                val.ArticleId = item.ArticleId;
-                val.Unit=item.LoanDetails.Unit;
-                val.LoanId = item.LoanDetails.LoanId;
-                val.ArticleName = item.LoanDetails.ArticleName;
-                val.DateTaken = item.LoanDetails.LoanMaster.DateTaken;
-                val.DueDate= item.LoanDetails.LoanMaster.DueDate;
-                val.LoanAmount=item.LoanDetails.LoanMaster.LoanAmount;
-                val.Selected = true;
-                
-                repledgeViewModels.Add(val);
-            }
+            repledgeMasterViewModel.RepledgeMaster= repledgeMaster;
+            repledgeMasterViewModel.RepledgeViewModels = model;
+            repledgeMasterViewModel.Banks = banks;
 
-            RepledgeMasterViewModel repledgeMaster = new RepledgeMasterViewModel();
-            repledgeMaster.RepledgeMaster=loan;
-            repledgeMaster.RepledgeViewModels = repledgeViewModels;
-            repledgeMaster.Banks = banks;
-
-            return View(repledgeMaster);
+            return View(repledgeMasterViewModel);
         }
 
         public IActionResult Update(RepledgeMasterViewModel model)
@@ -152,6 +151,46 @@ namespace GoldLoanFinance.Web.Controllers
             _repledgeService.DeleteRepledge(id);
 
             return RedirectToAction("ListRepledgedItems");
+        }
+
+        public IActionResult Details(int id) 
+        {
+            RepledgeMaster? loan = _repledgeService.GetRepledgeItemsById(id);
+            if (loan == null)
+            {
+                return NotFound();
+            }
+
+            List<SelectListItem> banks = _bankService.GetAllBanks().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.BankId.ToString()
+            }).ToList();
+
+            List<RepledgeViewModel> repledgeViewModels = new List<RepledgeViewModel>();
+
+            foreach (RepledgeDetails item in loan.RepledgeDetails)
+            {
+                RepledgeViewModel val = new RepledgeViewModel();
+
+                val.ArticleId = item.ArticleId;
+                val.Unit = item.LoanDetails.Unit;
+                val.LoanId = item.LoanDetails.LoanId;
+                val.ArticleName = item.LoanDetails.ArticleName;
+                val.DateTaken = item.LoanDetails.LoanMaster.DateTaken;
+                val.DueDate = item.LoanDetails.LoanMaster.DueDate;
+                val.LoanAmount = item.LoanDetails.LoanMaster.LoanAmount;
+                val.Selected = true;
+
+                repledgeViewModels.Add(val);
+            }
+
+            RepledgeMasterViewModel repledgeMaster = new RepledgeMasterViewModel();
+            repledgeMaster.RepledgeMaster = loan;
+            repledgeMaster.RepledgeViewModels = repledgeViewModels;
+            repledgeMaster.Banks = banks;
+
+            return View(repledgeMaster);
         }
     }
 }   

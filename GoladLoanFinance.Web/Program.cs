@@ -2,6 +2,7 @@ using GoldLoanFinance.Application.Interfaces;
 using GoldLoanFinance.Application.Services;
 using GoldLoanFinance.Infrastructure.Data;
 using GoldLoanFinance.Infrastructure.Repositories;
+using GoldLoanFinance.Web.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,13 +21,21 @@ builder.Services.AddScoped<RepledgeService>();
 builder.Services.AddScoped<IRepledgeRepository, RepledgeRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+
+builder.Services.AddTransient<ErrorLoggingMiddleware>();
+
 var app = builder.Build();
 
+app.UseMiddleware<ErrorLoggingMiddleware>();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/Status/{0}");
     app.UseHsts();
 }
 
