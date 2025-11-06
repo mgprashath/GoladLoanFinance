@@ -4,29 +4,36 @@
     ViewData["Title"] = "Edit";
 }
 
-<h4>Edit</h4>
-
 <h4>Edit Customer</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-controller="Customer" asp-action="Update">
+        <form asp-controller="Customer" asp-action="Update" onsubmit="return validateForm(event)" id="frmCustomer">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CustomerId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" id="txtCustomerName" oninput="validateName(event)" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+                <span id="valName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NIC" class="control-label"></label>
-                <input asp-for="NIC" class="form-control" />
+                <input asp-for="NIC" class="form-control" id="txtNIC" oninput="validateNIC(event)" />
                 <span asp-validation-for="NIC" class="text-danger"></span>
+                <span id="valNIC" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" />
+                <input asp-for="Phone" class="form-control" id="txtPhone" oninput="validatePhone(event)" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
+                <span id="valPhone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfBirth" class="control-label"></label>
+                <input asp-for="DateOfBirth" class="form-control" id="txtDOB" min="1900-01-01" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                <span id="valDOB" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
@@ -42,4 +49,142 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function(){
+            const bt= document.getElementById("txtDOB");
+
+            const nowDate = new Date();
+
+            bt.max = nowDate.toISOString().slice(0,16);
+        });
+
+        window.validatePhone = function(e){
+            const errorMessage = document.getElementById("valPhone");
+
+            if(/[^0-9]/.test(e.target.value)){
+                const digits = e.target.value.replace(/\D/g,'').slice(0,10);
+                if(digits !== e.target.value){
+                    e.target.value= digits;
+                }
+                errorMessage.textContent="Phone number is a 10 digit number";
+                return;
+            }
+            else{
+                 errorMessage.textContent="";
+            }
+        }
+
+        window.validateNIC = function(e){
+            const errorMessage = document.getElementById("valNIC");
+
+            if(/[^A-Za-z0-9]/.test(e.target.value)){
+                const nics = e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0,10);
+                if(nics !== e.target.value){
+                    e.target.value = nics;
+                }
+                errorMessage.textContent = "Invalid NIC";
+                return;
+            }else{
+                errorMessage.textContent="";
+            }
+
+        }
+
+        window.validateName = function(e){
+            const errorMessage = document.getElementById("valName");
+
+            if(/[^A-Za-z]/.test(e.target.value)){
+                const chars = e.target.value.replace(/[^A-Za-z]/g,'').slice(0,50);
+                if(chars!== e.target.value){
+                    e.target.value = chars;
+                }
+                errorMessage.textContent="Invalid Name";
+                return;
+            }else{
+                errorMessage.textContent="";
+            }
+        }       
+
+        window.validateForm = function(e){
+            const customerName = document.getElementById("txtCustomerName");
+            const phone = document.getElementById("txtPhone");
+            const NIC = document.getElementById("txtNIC");
+            const valName = document.getElementById("valName");
+            const valNIC = document.getElementById("valNIC");
+            const valPhone = document.getElementById("valPhone");
+            const dobInput = document.getElementById("txtDOB");
+            const dobValue = dobInput.value.trim();
+
+            const defaultValue = "1900-01-01";
+
+            let isValid = true;
+
+            if(customerName.value.trim()===""){
+                valName.textContent="The Name field is required.";
+                isValid= false;
+            }else if(/[^A-Za-z]/.test(customerName.value)){
+                const chars = customerName.value.replace(/[^A-Za-z]/g,'').slice(0,50);
+                if(chars!== customerName.value){
+                    customerName.value = chars;
+                }
+                valName.textContent="Invalid Name";
+                isValid= false;
+
+            }else{
+                valName.textContent="";
+            }
+
+            if(NIC.value.trim()===""){
+                valNIC.textContent="The NIC field is required.";
+                isValid=false;
+            }else if(NIC.value.trim().length < 10){
+                valNIC.textContent="The NIC number must be 10 characters long";
+                isValid=false;
+            }else if(/[^A-Za-z0-9]/.test(NIC.value)){
+                const nics = NIC.value.replace(/[^A-Za-z0-9]/g, '').slice(0,10);
+                if(nics !== NIC.value){
+                    NIC.value = nics;
+                }
+                valNIC.textContent = "Invalid NIC";
+                isValid= false;
+
+            }else{
+                valNIC.textContent="";
+            }
+
+            if(phone.value.trim()===""){
+                valPhone.textContent="The phone field is required.";
+                isValid=false;
+            }else if(phone.value.trim().length<10){
+                valPhone.textContent="The phone number must contain 10 digits.";
+                isValid=false;
+            }else if(/[^0-9]/.test(phone.value)){
+                const digits = phone.value.replace(/\D/g,'').slice(0,10);
+                if(digits !== phone.value){
+                    phone.value= digits;
+                }
+                valPhone.textContent="Invalid phone Number";
+                isValid= false;
+            }else{
+                valPhone.textContent="";
+            }
+
+            if (dobValue.length === 0 || dobValue === defaultValue) {
+                valDOB.textContent = "Please enter a valid Date of Birth.";
+
+                isValid = false;
+            }else{
+                valDOB.textContent="";
+            }
+
+            if(!isValid){
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 }

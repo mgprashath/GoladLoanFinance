@@ -49,6 +49,7 @@ namespace GoldLoanFinance.Web.Controllers
             RepledgeMasterViewModel repledgeMaster = new RepledgeMasterViewModel();
             repledgeMaster.RepledgeViewModels = model;
             repledgeMaster.Banks = banks;
+            repledgeMaster.RepledgeMaster = new RepledgeMaster();
 
             return View(repledgeMaster);
         }

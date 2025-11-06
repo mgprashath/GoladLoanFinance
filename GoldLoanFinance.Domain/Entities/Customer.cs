@@ -19,10 +19,16 @@ namespace GoldLoanFinance.Domain.Entities
         public string Name { get; set; }
         [Required]
         [MaxLength(10)]
+
         public string NIC { get; set; }
         [Required]
         [MaxLength(10)]
         public string Phone { get; set; }
+
+        [Required]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DateOfBirth { get; set; }
 
     }
 }

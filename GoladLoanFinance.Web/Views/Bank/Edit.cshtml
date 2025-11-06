@@ -10,13 +10,14 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-controller="Bank" asp-action="Update">
+        <form asp-controller="Bank" asp-action="Update" onsubmit="return ValidateInputs(event)">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="BankId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" id="txtBankName" oninput="ValidateBankName(event)" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+                <span id="valName" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
@@ -31,5 +32,35 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @*@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}*@
+
+    <script>
+
+        window.ValidateBankName = function (e){
+            
+            if(/[^A-Za-z0-9]/.test(e.target.value)){
+                const data = e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0,50);
+                if(data!==e.target.value){
+                    e.target.value=data;
+                    return;
+                }
+            }
+        }
+
+        window.ValidateInputs = function(e){
+            const errorMessage = document.getElementById("valName");
+            const element = document.getElementById("txtBankName");
+
+            if(element.value.trim().length == 0) {
+                errorMessage.textContent ="Bank name cannot be empty.";
+                e.preventDefault();
+                return false;
+            }else{
+                errorMessage.textContent ="";
+            }
+
+            return true;
+        }
+
+    </script>
 }

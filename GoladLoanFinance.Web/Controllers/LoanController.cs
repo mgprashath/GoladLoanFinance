@@ -24,7 +24,8 @@ namespace GoldLoanFinance.Web.Controllers
                 {
                     Text = u.Name,
                     Value = u.CustomerId.ToString()
-                }).ToList()
+                }).ToList(),
+                LoanMaster = new LoanMaster()
             };
 
             return View(loanViewModel);
@@ -119,6 +120,8 @@ namespace GoldLoanFinance.Web.Controllers
 
             return View(loanViewModel);
         }
+
+
 
     }
 }

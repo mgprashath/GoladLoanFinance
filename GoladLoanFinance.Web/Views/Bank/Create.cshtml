@@ -8,12 +8,13 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-controller="Bank" asp-action="Create">
+        <form asp-controller="Bank" asp-action="Create" onsubmit="return ValidateInputs(event)">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" id="txtBankName" oninput="ValidateBankName(event)" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+                <span class="text-danger" id="valName"></span>
             </div>
             <br />
             <div class="form-group">
@@ -28,5 +29,37 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        window.ValidateBankName = function (e){
+            const errorMessage = document.getElementById("valName");
+
+            if(/[^A-Za-z]/.test(e.target.value)){
+                const data = e.target.value.replace(/[^A-Za-z]/g, '').slice(0,50);
+                if(data!==e.target.value){
+                    e.target.value=data;                    
+                }
+                errorMessage.textContent = "Please enter a valid name";
+                
+                return;
+            }else{
+                errorMessage.textContent = "";
+            }
+        }
+
+        window.ValidateInputs = function(e){
+            const errorMessage = document.getElementById("valName");
+            const element = document.getElementById("txtBankName");
+
+            if (element.value.trim().length === 0) {
+                errorMessage.textContent = "Bank name cannot be empty.";
+                e.preventDefault();
+                return false;
+            }else{
+                errorMessage.textContent = "";
+            }
+            return true;
+        }
+    </script>
 }

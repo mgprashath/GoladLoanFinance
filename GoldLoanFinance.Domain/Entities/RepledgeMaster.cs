@@ -18,7 +18,9 @@ namespace GoldLoanFinance.Domain.Entities
         [DisplayName("Loan Amount From Bank")]
         public decimal LoanAmountFromBank { get; set; }
         [DisplayName("Date")]
-        public DateTime DatePledged { get; set; } = DateTime.Now;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DatePledged { get; set; } = DateTime.Today;
 
         [Required]
         [ForeignKey("Bank")]

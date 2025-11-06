@@ -6,7 +6,7 @@
 
 <h4>Repledge Items</h4>
 <br />
-<form asp-action="CreateRepledge" asp-controller="Repledge" method="post" id="repledgeForm">
+<form asp-action="CreateRepledge" asp-controller="Repledge" method="post" id="repledgeForm" onsubmit="return ValidateForm(event)">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="row">
         <div class="col-md-12">        
@@ -25,20 +25,22 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label asp-for="RepledgeMaster.Bank.Name" class="control-label"></label>
-                <select asp-for="RepledgeMaster.BankId" class="form-control" asp-items="@Model.Banks">
-                    <option disabled selected>--Select Bank--</option>
+                <label asp-for="RepledgeMaster.Bank.Name" class="control-label" ></label>
+                <select asp-for="RepledgeMaster.BankId" class="form-control" id="lstBank" asp-items="@Model.Banks">
+                    <option value="-1" disabled selected>--Select Bank--</option>
                 </select>
                 <span asp-validation-for="RepledgeMaster.BankId" class="text-danger"></span>
+                <span id="valBank" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RepledgeMaster.LoanAmountFromBank" class="control-labal"></label>
-                <input asp-for="RepledgeMaster.LoanAmountFromBank" class="form-control" />
+                <input asp-for="RepledgeMaster.LoanAmountFromBank" class="form-control" id="txtLoanAmount" oninput="ValidateLoanAmount(event)" />
                 <span asp-validation-for="RepledgeMaster.LoanAmountFromBank" class="text-danger"></span>
+                <span id="valLoanAmount" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RepledgeMaster.DatePledged" class="control-labal"></label>
-                <input asp-for="RepledgeMaster.DatePledged" class="form-control" />
+                <input type="date" asp-for="RepledgeMaster.DatePledged" id="txtPledgedDate" class="form-control" />
             </div>
         </div>
     </div>
@@ -53,22 +55,94 @@
     </div>
 </form>
 
-<script>
-    document.getElementById('repledgeForm').addEventListener('submit', function (e) {
-      const anyChecked = document.querySelector(
-        '#articleList input[type="checkbox"][name^="RepledgeViewModels"][name$=".Selected"]:checked'
-      );
-      const messageDiv = document.getElementById("formMessage");
-      if (!anyChecked) {
-        e.preventDefault();
-        messageDiv.innerText="Please add at least one item before submitting the form.";
-        return;
-      }
-    });
-</script>
-
 @section Scripts {
-    @{
+  @*   @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    } *@
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const dd = document.getElementById("txtPledgedDate");
+
+            function getTodayDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+            }
+
+            const todayDateString = getTodayDateString();
+
+            dd.max = todayDateString;
+        });        
+
+        document.getElementById('repledgeForm').addEventListener('submit', function (e) {
+          const anyChecked = document.querySelector(
+            '#articleList input[type="checkbox"][name^="RepledgeViewModels"][name$=".Selected"]:checked'
+          );
+          const messageDiv = document.getElementById("formMessage");
+          const bankElement = document.getElementById("lstBank");
+          const valBank = document.getElementById("valBank");
+          const loanAmountElement = document.getElementById("txtLoanAmount");
+          const valLoanAmount = document.getElementById("valLoanAmount");
+               
+          if (!anyChecked) {
+            e.preventDefault();
+            messageDiv.innerText="Please add at least one item before submitting the form.";
+            if(bankElement.value=== "-1"){
+               valBank.textContent = "Please select a Bank";
+            }
+            if(loanAmountElement.value <= 0){
+                    valLoanAmount.textContent = "Loan amount must be greater than zero";
+            }
+            return;
+          }                 
+        });
+
+        window.ValidateLoanAmount = function(e){
+        const inputElement = e.target;
+        const valLoanAmount = document.getElementById("valLoanAmount");
+        let inputValue = inputElement.value;
+        let errorDetected = false;
+
+        if (/[^0-9.]/.test(inputValue)){
+            const cleanValue = inputValue.replace(/[^0-9.]/g, '').slice(0, 15);
+            if(cleanValue !== inputValue){
+                inputElement.value = cleanValue;
+                valLoanAmount.textContent = "Only numbers and a decimal point are allowed.";
+                errorDetected = true;
+            }
+            inputValue = cleanValue;
+        }
+        const decimalCount = (inputValue.match(/\./g) || []).length;
+           if (decimalCount > 1) {
+
+               const fixedValue = inputValue.replace(/(\..*)\./g, '$1');
+               inputElement.value = fixedValue;
+               valLoanAmount.textContent = "Only one decimal point is allowed.";
+               errorDetected = true;
+           } else if (decimalCount === 1) {
+
+               if (inputValue.startsWith('.')) {
+                   inputElement.value = '0' + inputValue;
+                   valLoanAmount.textContent = "";
+               }
+           }
+
+           if (inputElement.value.trim().length === 0) {
+               valLoanAmount.textContent = "Loan amount cannot be empty.";
+               errorDetected = true;
+           }
+
+           if (errorDetected) {
+               inputElement.focus();
+               return;
+           }
+
+           valLoanAmount.textContent = "";
+           }
+    </script>
 }

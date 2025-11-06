@@ -14,8 +14,12 @@ namespace GoldLoanFinance.Domain.Entities
         public int LoanId { get; set; }        
         [Required]
         public decimal LoanAmount { get; set; }
-        public DateTime DateTaken { get; set; }
-        public DateTime DueDate { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DateTaken { get; set; } = DateTime.Today;
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime DueDate { get; set; } = DateTime.Today.AddYears(1);
 
         [Required]
         [ForeignKey("Customer")]
